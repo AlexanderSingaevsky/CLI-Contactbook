@@ -46,7 +46,7 @@ class _Phone(_Field):
     @property
     def value(self) -> str:
         return self._value
-        
+
     @value.setter
     def value(self, value):
         if not re.compile(r'^\+(?:\d[\s-]?){9,14}\d$|\d{9,10}$').match(value):
@@ -64,10 +64,9 @@ class _Email(_Field):
     @property
     def value(self) -> str:
         return self._value
-    
+
     @value.setter
     def value(self, value):
-        
         if not re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').match(value):
             raise ValueError("Provided email is not valid")
         self._value = value
@@ -75,14 +74,15 @@ class _Email(_Field):
     def __str__(self) -> str:
         return self._value
 
+
 class _Birthday(_Field):
     def __init__(self, value):
         super().__init__(value)
-    
+
     @property
     def value(self) -> date:
         return self._value
-    
+
     @value.setter
     def value(self, value) -> None:
         email_value_pattern = r"[-|_|\\|/]"
@@ -142,11 +142,10 @@ class _Record:
         str_phones = ' '.join(phone.value for phone in self.phones)
         str_email = self.email.value if self.email else str()
         str_birthday = str(self.birthday) if self.birthday else str()
-        return ' | '.join((self.name.value, str_email, str_phones, str_birthday))
+        return '|'.join((self.name.value, str_email, str_phones, str_birthday))
 
 
 class AddressBook(UserDict):
-
     notebook = NoteBook()
 
     def add_record(self, name: str):
@@ -166,19 +165,19 @@ class AddressBook(UserDict):
             print(str(i).capitalize())
 
     def search(self, query):
-        
-        results = []
+        results = ""
         for record in self.data.values():
-            if query.lower() in record.name.value.lower() or \
-               any(query in phone.value for phone in record.phones) or \
-               (record.birthday and query.lower() in str(record.birthday)) or \
-               (record.email and query.lower() in record.email.value.lower()):
+            if query.lower() in str(record):
                 str_phones = ', '.join(phone.value for phone in record.phones) if record.phones else "No records"
                 str_birthday = record.birthday if record.birthday else "No records"
                 str_email = record.email if record.email else "No records"
                 formatted_record = f"\n Name: {record.name.value}\n Phones: {str_phones}\n Birthday: {str_birthday}\n Email: {str_email}\n"
-                results.append(formatted_record)
+                results += formatted_record
+        founded_notes = self.notebook.search_note(query)
+        formatted_notes = [str(note) for note in founded_notes]
+        results += "".join(formatted_notes)
         return results
+
 
     def contacts_with_days_to_bday(self, days):
         result = []
@@ -192,7 +191,7 @@ class AddressBook(UserDict):
             if delta.days == int(days):
                 result.append(f"{record.name}, {record.bday}")
         return "\n".join(result)
-    
+
     def save_records_to_file(self, filename):
         with open(filename, "wb") as fw:
             pickle.dump(self.data, fw)
@@ -205,18 +204,19 @@ class AddressBook(UserDict):
         except FileNotFoundError:
             pass
 
+
 if __name__ == '__main__':
     # Примеры работы с адресной книгой
     addressbook = AddressBook()
-    addressbook.add_record("Alexander")                         # Создаем контакт
-    addressbook["Alexander"].add_phone('111111111')             # Добавляем к контакту 1 номер
-    addressbook["Alexander"].add_phone('111111112')             # Добавляем к контакту 2 номер
-    addressbook["Alexander"].add_phone('111111113')             # Добавляем к контакту 3 номер
-    addressbook["Alexander"].set_birthday('30-09-2022')         # Добавляем к контакту день рождения
-    addressbook["Alexander"].set_email('abcdef@gmail.com')      # Добавляем к контакту емеил
+    addressbook.add_record("Alexander")  # Создаем контакт
+    addressbook["Alexander"].add_phone('111111111')  # Добавляем к контакту 1 номер
+    addressbook["Alexander"].add_phone('111111112')  # Добавляем к контакту 2 номер
+    addressbook["Alexander"].add_phone('111111113')  # Добавляем к контакту 3 номер
+    addressbook["Alexander"].set_birthday('30-09-2022')  # Добавляем к контакту день рождения
+    addressbook["Alexander"].set_email('abcdef@gmail.com')  # Добавляем к контакту емеил
     # удалять день рождения и емеил пока что нельзя, только переназначать
-    addressbook["Alexander"].del_phone('111111112')             # Удаляем номер
+    addressbook["Alexander"].del_phone('111111112')  # Удаляем номер
     # изменение номера телефона делается путем удаления старого номера и добавления нового
-    addressbook.show_records()                                  # заглушка, нужно сделать через генератор
-    addressbook.del_record("Alexander")                         # Удаляем запись
+    addressbook.show_records()  # заглушка, нужно сделать через генератор
+    addressbook.del_record("Alexander")  # Удаляем запись
     addressbook.show_records()

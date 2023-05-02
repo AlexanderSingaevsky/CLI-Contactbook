@@ -70,8 +70,7 @@ def add_handler(addressbook: AddressBook, *args) -> str:
         addressbook[args[1]].set_birthday(args[2])
         message = f'Birthday {args[2]} added to {args[1]} record.'
     elif args[0] == 'note':
-        addressbook.notebook.create_note()
-        message = f'{len(addressbook.notebook.data.values())}'
+        message = addressbook.notebook.create_note()
     elif args[0] == 'tags':
 
         message = addressbook.notebook.set_tags()
@@ -126,12 +125,13 @@ def del_handler(addressbook: AddressBook, *args) -> str:
 
 @input_error
 def show_handler(addressbook: AddressBook, *args) -> str:
-    if args[0] == "notes":
-        addressbook.notebook.show_notes()
-        return 'All notes are shown.'
-    else:
+    if len(args) < 1:
         addressbook.show_records()
         return 'All records are shown.'
+    elif len(args) == 1 and args[0] == 'notes':
+        mes = addressbook.notebook.show_notes()
+        return mes
+    return "Something went wrong."
 
 
 @input_error
@@ -139,17 +139,17 @@ def search_handler(addressbook: AddressBook, *args):
     query = " ".join(args)
     results = addressbook.search(query)
     if not results:
-        res_notes = addressbook.notebook.search_note(query)
-        if res_notes:
-            print(f"{len(res_notes)} note(s) was found.")
-            response = "".join(str(note) for note in res_notes)
-            return response
-        else:
-            return "Nothing was found."
-    response = ""
-    for record in results:
-        response += f"{str(record.name.value).capitalize()}: {record.phones}\n"
-    return response
+        # res_notes = addressbook.notebook.search_note(query)
+        # if res_notes:
+        #     print(f"{len(res_notes)} note(s) was found.")
+        #     response = "".join(str(note) for note in res_notes)
+        #     return response
+        # else:
+        return "Nothing was found."
+    # response = ""
+    # for record in results:
+    #     response += f"{str(record.name.value).capitalize()}: {record.phones}\n"
+    return results
 
 
 def find_tag(addressbook: AddressBook, *args):

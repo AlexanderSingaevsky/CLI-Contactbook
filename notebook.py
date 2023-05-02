@@ -28,13 +28,6 @@ class _Note:
                + "_" * 100
                + "\n"]
         return "\n".join(res)
-    # def __str__(self):
-    #     tags_str = " ".join('#'+str(tag) for tag in self.tags)
-    #     res = ["_" * 100
-    #            + f"\nNote '{self.note_title}':\n\n{self.note_text}\n{tags_str}\n"
-    #            + "_" * 100
-    #            + "\n"]
-    #     return "\n".join(res)
 
 
 class NoteBook(UserDict):
@@ -51,7 +44,8 @@ class NoteBook(UserDict):
         tags = [_HashTag(tag.strip()) for tag in tags_list]
         new_note = _Note(note_title, note_content, tags)
         self.add_note(new_note)
-        print(f"Note '{note_title}' created successfully!")
+        result = f"Note '{note_title}' created successfully!"
+        return result
 
     def add_note(self, note: _Note):
         self.data[note.note_title] = note
